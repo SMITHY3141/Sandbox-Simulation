@@ -1,9 +1,13 @@
 
 
+#include <EnTT/entt.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "runtime.hpp"
 #include "components/components.hpp"
 #include "systems/systems.hpp"
+#include "systems/rendering.hpp"
+
 
 #define TIME_STEP 0.01
 
@@ -20,4 +24,11 @@ void update(entt::registry* registry, double dt) {
 		sim_dt = TIME_STEP;
 
     debug_print(registry);
+}
+
+void render(entt::registry* registry, sf::RenderWindow* window) {
+    background(window);
+
+
+
 }

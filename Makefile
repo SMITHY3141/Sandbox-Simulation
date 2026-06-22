@@ -33,6 +33,9 @@ OBJ = $(SRC:.cpp=.o)
 sandbox: $(OBJ)
 	$(CXX) $(OBJ) -o sandbox $(LDFLAGS) $(LDLIBS) $(FRAMEWORKS)
 
+debug: CFLAGS += -g
+debug: sandbox
+
 #-pthread here if needed
 
 
