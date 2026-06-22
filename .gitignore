@@ -3,6 +3,7 @@
 .LSOverride
 
 .env
+*.o
 
 
 .vscode/
