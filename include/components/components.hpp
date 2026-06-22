@@ -4,14 +4,10 @@
 #ifndef COMPONENTS_HPP
 #define COMPONENTS_HPP
 
-struct Position {
-    double x;
-    double y;
+#include <SFML/Graphics.hpp>
 
-};
 struct Camera {
-    double width;
-    double height;
+    sf::View view;
 
 };
 

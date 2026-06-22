@@ -5,7 +5,8 @@
 
 #include <SFML/Graphics.hpp>
 
-void background(sf::RenderWindow* window);
+void set_view(sf::RenderWindow *window, entt::registry *registry);
+void background(sf::RenderWindow *window);
 
 
 

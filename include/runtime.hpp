@@ -6,11 +6,14 @@
 
 #include <EnTT/entt.hpp>
 #include <SFML/Graphics.hpp>
+#include "inputs.hpp"
 
-void init(entt::registry* registry);
+void process_events(sf::RenderWindow *window, InputState *state);
 
-void update(entt::registry* registry, double dt);
+void init(entt::registry *registry);
 
-void render(entt::registry* registry, sf::RenderWindow* window);
+void update(entt::registry *registry, InputState *state, double dt);
+
+void render(entt::registry *registry, sf::RenderWindow *window);
 
 #endif // RUNTIME_HPP
