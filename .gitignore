@@ -1,0 +1,12 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+
+.env
+
+
+.vscode/
+lib/EnTT
+lib/SFML-2.6.2
+
+
