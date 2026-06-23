@@ -9,34 +9,34 @@
 
 #define MOVE_SPEED 0.1
 
-void debug_print(entt::registry *registry) {
-	auto view = registry->view<Camera>();
-	for (auto [entity, camera] : view.each()) {
-        printf("debug at entity %f\n", camera.view.getSize().x);
-
-        
-	}
+void debug_print(double dt) {
+    printf("fps: %lf\n", 1/dt);
 }
 
 
 void camera_controls(entt::registry *registry, InputState *state, double dt) {
+
+    int mod = 1 + 10 * state->keys[sf::Keyboard::LShift];
+    
+    int forward = state->keys[sf::Keyboard::W] - state->keys[sf::Keyboard::S];
+    int strafe = state->keys[sf::Keyboard::D] - state->keys[sf::Keyboard::A];
+
+    double zoom = dt * (state->keys[sf::Keyboard::Down] - state->keys[sf::Keyboard::Up]);
+    if (zoom < -0.9) {
+        zoom = -0.9;
+    }
+
+    if (!forward && !strafe && !zoom) {
+        return;
+    }
+
    	auto view = registry->view<Camera>();
 	for (auto [entity, camera] : view.each()) {
-        double scl = camera.view.getSize().x * MOVE_SPEED * dt;
-        int forward = state->keys[sf::Keyboard::W] - state->keys[sf::Keyboard::S];
-        int strafe = state->keys[sf::Keyboard::D] - state->keys[sf::Keyboard::A];
-
-        if (forward || strafe) {
-            camera.view.move(sf::Vector2f(strafe * scl, forward * scl));
-        }
-        int zoom = state->keys[sf::Keyboard::Down] - state->keys[sf::Keyboard::Up];
+        double scl = mod * camera.view.getSize().x * MOVE_SPEED * dt;
+        camera.view.move(sf::Vector2f(strafe * scl, forward * scl));
 
         if (zoom) {
-            double factor = zoom * dt;
-            if (factor < -0.9) {
-                factor = -0.9;
-            }
-            camera.view.zoom(factor + 1);
+            camera.view.zoom(zoom + 1);
 
         }
 	}

@@ -11,6 +11,7 @@
 
 #define TIME_STEP 0.01
 #define DEFAULT_SIZE 200.0
+#define FONT_PATH "assets/fonts/Pixeltype.ttf"
 
 
 void process_events(sf::RenderWindow *window, InputState *state) {
@@ -33,7 +34,11 @@ void process_events(sf::RenderWindow *window, InputState *state) {
     // TODO need one for mouse buttons too
 }
 
-void init(entt::registry *registry) {
+void init(entt::registry *registry, sf::Font *font) {
+    if (!font->loadFromFile(FONT_PATH)) {
+        exit(1); // Could not load font path
+    }
+
 	auto camera = registry->create();
 	registry->emplace<Camera>(camera,sf::View(sf::Vector2f(0.0, 0.0), sf::Vector2f(DEFAULT_SIZE, -DEFAULT_SIZE)));
 
@@ -44,16 +49,17 @@ void update(entt::registry *registry, InputState *state, double dt) {
 	if (TIME_STEP)
 		sim_dt = TIME_STEP;
 
-    //debug_print(registry);
+    debug_print(dt);
     camera_controls(registry, state, dt);
 
 
 
 }
 
-void render(entt::registry *registry, sf::RenderWindow *window) {
+void render(entt::registry *registry, sf::RenderWindow *window, sf::Font *font) {
+    window->setView(window->getDefaultView());
     set_view(window, registry);
-    background(window);
+    background(window, registry, font);
 
 
 
