@@ -9,7 +9,8 @@
 typedef struct {
     bool keys[sf::Keyboard::KeyCount];
     bool mouse[sf::Mouse::ButtonCount];
-    sf::Vector2i mousePos;
+    bool mouse_click[sf::Mouse::ButtonCount];
+    sf::Vector2f mousewrld;
 } InputState;
 
 #endif // INPUTS_HPP

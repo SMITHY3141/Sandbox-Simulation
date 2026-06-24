@@ -2,20 +2,27 @@
 
 #include <EnTT/entt.hpp>
 #include <SFML/Graphics.hpp>
+#include <ODE/ode.h>
 
 #include "runtime.hpp"
 #include "components/components.hpp"
-#include "systems/systems.hpp"
-#include "systems/rendering.hpp"
+#include "systems/core.hpp"
+#include "systems/ui.hpp"
+#include "systems/model.hpp"
+#include "systems/viewer.hpp"
+#include "colours.hpp"
 
 
 #define TIME_STEP 0.01
-#define DEFAULT_SIZE 200.0
+#define DEFAULT_SIZE 5.0
 #define FONT_PATH "assets/fonts/Pixeltype.ttf"
 
 
 void process_events(sf::RenderWindow *window, InputState *state) {
     sf::Event event;
+
+    if (!state->keys[sf::Keyboard::LShift])
+        memset(state->mouse_click, 0, sizeof(state->mouse_click));
 
     while (window->pollEvent(event)) {
         if (event.type == sf::Event::Closed)
@@ -27,8 +34,22 @@ void process_events(sf::RenderWindow *window, InputState *state) {
         if (event.type == sf::Event::KeyReleased)
             state->keys[event.key.code] = false;
 
-        if (event.type == sf::Event::MouseMoved)
-            state->mousePos = {event.mouseMove.x, event.mouseMove.y};
+        if (event.type == sf::Event::MouseMoved) {
+            sf::Vector2i pixelPos(event.mouseMove.x, event.mouseMove.y);
+            state->mousewrld = window->mapPixelToCoords(pixelPos);
+
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed) {
+            state->mouse_click[event.mouseButton.button] = true;
+            state->mouse[event.mouseButton.button] = true;
+        }
+
+        if (event.type == sf::Event::MouseButtonReleased) {
+            state->mouse[event.mouseButton.button] = false;
+            state->mouse_click[event.mouseButton.button] = false;
+
+    }
     }
 
     // TODO need one for mouse buttons too
@@ -49,17 +70,30 @@ void update(entt::registry *registry, InputState *state, double dt) {
 	if (TIME_STEP)
 		sim_dt = TIME_STEP;
 
-    debug_print(dt);
+    //debug_print(dt);
+
     camera_controls(registry, state, dt);
+
+
+    spawn_particle(registry, state, ode_example);
+
+    //TODO add ability to pause
+    step_particles(registry, dt);
 
 
 
 }
 
 void render(entt::registry *registry, sf::RenderWindow *window, sf::Font *font) {
-    window->setView(window->getDefaultView());
+    window->clear(COLOUR_CLEAR);
     set_view(window, registry);
-    background(window, registry, font);
+   
+    Bounds bounds = get_bounds(window);
+    background(window, font, &bounds);
+
+    draw_phasespace(window, &bounds, ode_example);
+    draw_particles(window, registry, &bounds);
+
 
 
 

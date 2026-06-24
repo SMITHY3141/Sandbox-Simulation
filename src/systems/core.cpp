@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include <EnTT/entt.hpp>
-#include "systems/systems.hpp"
+#include "systems/core.hpp"
 #include "components/components.hpp"
 #include "inputs.hpp"
 

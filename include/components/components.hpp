@@ -12,7 +12,6 @@ struct Camera {
 };
 
 
-
 #endif // COMPONENTS_HPP
 
 

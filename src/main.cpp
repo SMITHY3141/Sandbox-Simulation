@@ -13,6 +13,8 @@
 
 
 int main(int argc, char** argv) {
+    (void)argc;
+    (void)argv; // silence warnings
     
     sf::RenderWindow window(sf::VideoMode(START_WIDTH, START_HEIGHT), WINDOW_NAME);
     //window.setVerticalSyncEnabled(true);
@@ -39,8 +41,6 @@ int main(int argc, char** argv) {
 
 
         // Rendering
-        window.clear(sf::Color(252, 242, 255));
-
         render(&registry, &window, &font);
 
         window.display();
