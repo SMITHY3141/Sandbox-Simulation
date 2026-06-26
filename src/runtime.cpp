@@ -13,7 +13,7 @@
 #include "colours.hpp"
 
 
-#define TIME_STEP 0.01
+#define TIME_STEP 0.0
 #define DEFAULT_SIZE 5.0
 #define FONT_PATH "assets/fonts/Pixeltype.ttf"
 
@@ -49,7 +49,10 @@ void process_events(sf::RenderWindow *window, InputState *state) {
             state->mouse[event.mouseButton.button] = false;
             state->mouse_click[event.mouseButton.button] = false;
 
+        }
     }
+    if (state->keys[sf::Keyboard::Escape]) {
+        window->close();
     }
 
     // TODO need one for mouse buttons too
@@ -75,10 +78,10 @@ void update(entt::registry *registry, InputState *state, double dt) {
     camera_controls(registry, state, dt);
 
 
-    spawn_particle(registry, state, ode_example);
+    spawn_particle(registry, state, ode_forcedspring);
 
     //TODO add ability to pause
-    step_particles(registry, dt);
+    step_particles(registry, sim_dt);
 
 
 
@@ -91,7 +94,7 @@ void render(entt::registry *registry, sf::RenderWindow *window, sf::Font *font) 
     Bounds bounds = get_bounds(window);
     background(window, font, &bounds);
 
-    draw_phasespace(window, &bounds, ode_example);
+    draw_phasespace(window, &bounds, ode_forcedspring);
     draw_particles(window, registry, &bounds);
 
 

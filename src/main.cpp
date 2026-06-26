@@ -10,13 +10,17 @@
 #define START_WIDTH 800
 #define START_HEIGHT 800
 #define START_MAXIMISED 1
+#define ALIASING 4
 
 
 int main(int argc, char** argv) {
     (void)argc;
     (void)argv; // silence warnings
     
-    sf::RenderWindow window(sf::VideoMode(START_WIDTH, START_HEIGHT), WINDOW_NAME);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = ALIASING;
+
+    sf::RenderWindow window(sf::VideoMode(START_WIDTH, START_HEIGHT), WINDOW_NAME, sf::Style::Default, settings);
     //window.setVerticalSyncEnabled(true);
 
 
@@ -46,6 +50,8 @@ int main(int argc, char** argv) {
         window.display();
 
     }
+
+    // clean up entity stuff
     
 
     return 0;

@@ -16,6 +16,7 @@ System ode_zeros(void (*f)(float*, float, float*), int size) {
     system.t = 0.f;
     system.size = size;
     system.state = malloc(size * sizeof(float));
+    memset(system.state, 0, sizeof(float) * size);
     system.f = f;
 
     return system;
@@ -40,8 +41,14 @@ void ode_example(float *state, float time, float *result) {
     float y = state[0];
     float v = state[1];
 
-    result[0] = v; // y' =
-    result[1] = -0.4 * v - 2 * sin(y); // y'' =
+    //result[0] = v; // y' =
+    //result[1] = -0.4 * v - 2 * sin(y); // y'' =
+
+    //result[0] = 0.2 * y - v - y * (y * y + v * v);
+    //result[1] = y + 0.2 * v - v * (y * y + v * v);
+
+    result[0] = v;
+    result[1] = -2 * (y * y - 1) * v - y;
 
 }
 

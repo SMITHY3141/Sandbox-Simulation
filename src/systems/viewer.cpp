@@ -9,12 +9,10 @@
 
 #define SEGS 6
 
-
 // Chatgpt wrote this
-void draw_line(sf::Vector2f a, sf::Vector2f b, float thickness, sf::Color color, sf::VertexArray *lines) {
-    sf::VertexArray quad(sf::Quads, 4);
+void draw_arrow(sf::Vector2f loc, sf::Vector2f dir, float thickness, sf::Color colour, sf::VertexArray *triangles) {
+    sf::VertexArray triangle(sf::Triangles, 3);
 
-    sf::Vector2f dir = b - a;
     float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
     if (length == 0.f)
         return;
@@ -23,18 +21,15 @@ void draw_line(sf::Vector2f a, sf::Vector2f b, float thickness, sf::Color color,
 
     sf::Vector2f normal(-dir.y, dir.x);
 
-    sf::Vector2f offset = normal * (thickness * 0.5f);
+    triangle[0].position = loc;
+    triangle[1].position = loc - (5.f * dir + normal) * thickness; // magic number to stretch
+    triangle[2].position = loc - (5.f * dir - normal) * thickness;
 
-    quad[0].position = a + offset;
-    quad[1].position = b + offset;
-    quad[2].position = b - offset;
-    quad[3].position = a - offset;
-
-    for (int i = 0; i < 4; ++i)
-        quad[i].color = color;
-
-    for (int i = 0; i < 4; ++i)
-        lines->append(quad[i]);
+    for (int i = 0; i < 3; i++) {
+        triangle[i].color = colour;
+        triangles->append(triangle[i]);
+    
+    }
 }
 
 
@@ -48,10 +43,10 @@ void draw_phasespace(sf::RenderWindow *window, Bounds *bounds, ode_function f) {
     int ystart = std::ceil(bounds->bottom / yspacing);
     int yend = std::floor(bounds->top / yspacing);
 
-    sf::VertexArray lines(sf::Quads);   
+    sf::VertexArray triangles(sf::Triangles);   
     
     sf::View view = window->getView(); // need to restore it later
-    sf::View uiView(sf::FloatRect(0.f, 0.f, (float) window->getSize().x, (float) window->getSize().y));
+    sf::View uiView(sf::FloatRect(0.f, 0.f, window->getSize().x, window->getSize().y));
     window->setView(uiView);
 
     for (int i = xstart; i <= xend; i++) {
@@ -64,20 +59,12 @@ void draw_phasespace(sf::RenderWindow *window, Bounds *bounds, ode_function f) {
             float state[] = {x, y};
             f(state, 0, result);
 
-            sf::Vector2f v(result[0], result[1]);
-            float len = std::sqrt(v.x * v.x + v.y * v.y);
-            sf::Vector2f direction;
-            if (len) {
-                direction = sf::Vector2f(14*v.x / len, 14*v.y / len);
-            } else {
-                direction = sf::Vector2f(0.0f, 0.0f);
-            }
-
-            draw_line(sf::Vector2f(pixel.x, pixel.y), sf::Vector2f(pixel.x + direction.x, pixel.y - direction.y), 3, COLOUR_ARROW, &lines);
+            sf::Vector2f v(result[0], -result[1]); // have to invert because screen space
+            draw_arrow(sf::Vector2f(pixel.x, pixel.y), v, 3, COLOUR_ARROW, &triangles);
         }
     }
     
-    window->draw(lines);
+    window->draw(triangles);
     window->setView(view);
 }
 
@@ -96,7 +83,7 @@ void add_circle(sf::VertexArray *circles, sf::Vector2f centre, float radius, sf:
 
 void draw_particles(sf::RenderWindow *window, entt::registry *registry, Bounds *bounds) {
     sf::View view = window->getView(); // need to restore it later
-    sf::View uiView(sf::FloatRect(0.f, 0.f, (float) window->getSize().x, (float) window->getSize().y));
+    sf::View uiView(sf::FloatRect(0.f, 0.f, window->getSize().x, window->getSize().y));
     window->setView(uiView);
 
 

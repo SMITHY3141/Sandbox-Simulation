@@ -9,6 +9,17 @@
 #include "systems/model.hpp"
 
 
+void ode_forcedspring(float *state, float time, float *result) {
+    (void) time;
+    float y = state[0];
+    float v = state[1];
+
+    result[0] = v;
+    result[1] = -0.4 * v - 2 * y - 9*y;
+
+
+}
+
 void spawn_particle(entt::registry *registry, InputState *state, void (*f)(float*, float, float*)) {
     if (!state->mouse_click[sf::Mouse::Button::Left]) {
         return;
