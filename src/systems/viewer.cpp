@@ -4,6 +4,7 @@
 
 #include "systems/viewer.hpp"
 #include "systems/ui.hpp"
+#include "components/components.hpp"
 #include "colours.hpp"
 #include <cmath>
 
@@ -88,19 +89,15 @@ void draw_particles(sf::RenderWindow *window, entt::registry *registry, Bounds *
 
 
     sf::VertexArray circles(sf::Triangles);
-    for (auto [entity, system] : registry->view<System>().each()) {
-        if (system.size != 2) {
-            continue;
-
-        }
-        float x = system.state[0];
-        float y = system.state[1];
+    for (auto [entity, transform]: registry->view<Transform>().each()) {
+        float x = transform.position.x;
+        float y = transform.position.y;
         // TODO maybe add support for other sizes (like plot against time for 1D)
 
         if (x < bounds->left || x > bounds->right || y < bounds->bottom || y > bounds->top) {
             continue;
         }
-        sf::Vector2i pixel = window->mapCoordsToPixel({x, y}, view);
+        sf::Vector2i pixel = window->mapCoordsToPixel(transform.position, view);
 
         add_circle(&circles, sf::Vector2f(pixel), 9, COLOUR_PARTICLE);
 

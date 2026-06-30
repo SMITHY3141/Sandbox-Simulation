@@ -5,6 +5,7 @@
 
 #include "components/components.hpp"
 #include "systems/ui.hpp"
+#include "systems/manager.hpp"
 
 #include "colours.hpp"
 
@@ -33,6 +34,8 @@ float get_spacing(float ideal) {
 
 }
 
+
+
 // What can our camera actually see in the world
 // also gives us some info about the grid spacing
 Bounds get_bounds(sf::RenderWindow *window) {
@@ -54,6 +57,8 @@ Bounds get_bounds(sf::RenderWindow *window) {
     return bounds;
 
 }
+
+
 
 void draw_grid(sf::RenderWindow *window, const Bounds *bounds) {
     int xstart = std::floor(bounds->left / bounds->xspacing);
@@ -78,8 +83,38 @@ void draw_grid(sf::RenderWindow *window, const Bounds *bounds) {
         grid.append(sf::Vertex(sf::Vector2f(bounds->right, y), COLOUR_GRID));
     }
  
-    // TODO draw thick lines at the Axes
     window->draw(grid);
+
+}
+
+void draw_thick(sf::Vector2i a, sf::Vector2i b, float thickness, sf::Color colour, sf::VertexArray *triangles) {
+    sf::Vector2f A = sf::Vector2f(a);
+    sf::Vector2f B = sf::Vector2f(b);
+    sf::VertexArray triangle(sf::Triangles, 6);
+
+    sf::Vector2f dir = A - B;
+    float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+    if (length == 0.f)
+        return;
+
+    dir /= length;
+
+    sf::Vector2f normal(-dir.y * thickness, dir.x * thickness);
+
+    
+    triangle[0].position = A - normal;
+    triangle[1].position = A + normal;
+    triangle[2].position = B + normal;
+
+    triangle[3].position = B + normal;
+    triangle[4].position = B - normal;
+    triangle[5].position = A - normal;
+
+    for (int i = 0; i < 6; i++) {
+        triangle[i].color = colour;
+        triangles->append(triangle[i]);
+    
+    }
 }
 
 void draw_gridtext(sf::RenderWindow *window, const sf::View *view, sf::Font *font, const Bounds *bounds) {
@@ -92,6 +127,11 @@ void draw_gridtext(sf::RenderWindow *window, const sf::View *view, sf::Font *fon
     // TODO check size of text so it doesn't clip outside (below screen, to right)
     float xaxis = std::clamp(0.0f, bounds->left, bounds->right);
     float yaxis = std::clamp(0.0f, bounds->bottom, bounds->top);
+
+    sf::VertexArray triangles(sf::Triangles);
+    draw_thick(window->mapCoordsToPixel({bounds->left, yaxis}, *view), window->mapCoordsToPixel({bounds->right, yaxis}, *view), 1, COLOUR_AXIS, &triangles);
+    draw_thick(window->mapCoordsToPixel({xaxis, bounds->top}, *view), window->mapCoordsToPixel({xaxis, bounds->bottom}, *view), 1, COLOUR_AXIS, &triangles);
+    window->draw(triangles);
 
 
     // x axis text
@@ -154,3 +194,26 @@ void background(sf::RenderWindow *window, sf::Font *font, const Bounds *bounds) 
 
 }
 
+void update_transforms(entt::registry *registry) {
+	auto view = registry->view<Position, Attitude, Transform>();
+	for (auto [entity, pos, angle, data] : view.each()) {
+        data.position = sf::Vector2f(pos.x, pos.y);
+        data.rotation = 180.f * angle.pitch / M_PI;
+    }
+
+}
+
+void render_sprites(sf::RenderWindow *window, entt::registry *registry, TextureManager *textures, const Bounds *bounds) {
+	auto view = registry->view<Transform, SpriteComponent>();
+	for (auto [entity, transform, data] : view.each()) {
+        sf::Sprite sprite(textures->get(data.texture));
+        sprite.setPosition(transform.position);
+        sprite.setRotation(transform.rotation);
+        sprite.setScale(transform.scale);
+
+        // Todo add bounds check
+
+        window->draw(sprite);
+
+	}
+}

@@ -2,8 +2,8 @@
 
 
 
-#ifndef SYSTEMS_HPP
-#define SYSTEMS_HPP
+#ifndef CORE_HPP
+#define CORE_HPP
 
 #include "inputs.hpp"
 #include <EnTT/entt.hpp>
@@ -12,7 +12,8 @@ void debug_print(double dt);
 
 void camera_controls(entt::registry *registry, InputState *state, double dt);
 
+bool handle_pause(entt::registry *registry, InputState *state);
 
-#endif // SYSTEMS_HPP
+#endif // CORE_HPP
 
 

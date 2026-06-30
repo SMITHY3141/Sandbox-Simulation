@@ -1,10 +1,11 @@
 
 
-#ifndef RENDERING_HPP
-#define RENDERING_HPP
+#ifndef UI_HPP
+#define UI_HPP
 
 #include <SFML/Graphics.hpp>
 #include <EnTT/entt.hpp>
+#include "systems/manager.hpp"
 
 
 typedef struct {
@@ -21,7 +22,9 @@ void set_view(sf::RenderWindow *window, entt::registry *registry);
 Bounds get_bounds(sf::RenderWindow *window);
 void background(sf::RenderWindow *window, sf::Font *font, const Bounds *bounds);
 
+void render_sprites(sf::RenderWindow *window, entt::registry *registry, TextureManager *textures, const Bounds *bounds);
+void update_transforms(entt::registry *registry);
 
 
 
-#endif // RENDERING_HPP
+#endif // UI_HPP

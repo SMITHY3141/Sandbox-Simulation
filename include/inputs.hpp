@@ -8,6 +8,7 @@
 
 typedef struct {
     bool keys[sf::Keyboard::KeyCount];
+    bool keys_click[sf::Keyboard::KeyCount];
     bool mouse[sf::Mouse::ButtonCount];
     bool mouse_click[sf::Mouse::ButtonCount];
     sf::Vector2f mousewrld;

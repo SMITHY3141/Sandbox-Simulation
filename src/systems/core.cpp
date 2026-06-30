@@ -42,3 +42,13 @@ void camera_controls(entt::registry *registry, InputState *state, double dt) {
 	}
 }
 
+bool handle_pause(entt::registry *registry, InputState *state) {
+    auto &context = registry->ctx().get<Context>();
+
+    if (state->keys_click[sf::Keyboard::Space]) {
+        context.paused = !context.paused;
+
+    }
+    return context.paused;
+}
+
