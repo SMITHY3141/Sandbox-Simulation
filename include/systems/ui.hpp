@@ -22,6 +22,7 @@ void set_view(sf::RenderWindow *window, entt::registry *registry);
 Bounds get_bounds(sf::RenderWindow *window);
 void background(sf::RenderWindow *window, sf::Font *font, const Bounds *bounds);
 
+void draw_thick(sf::Vector2f a, sf::Vector2f b, float thickness, sf::Color colour, sf::VertexArray *triangles);
 void render_sprites(sf::RenderWindow *window, entt::registry *registry, TextureManager *textures, const Bounds *bounds);
 void update_transforms(entt::registry *registry);
 

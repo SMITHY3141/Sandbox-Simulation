@@ -6,27 +6,17 @@
 
 #include <SFML/Graphics.hpp>
 #include "systems/manager.hpp"
+#include <VECTORS/vectors.hpp>
 
-struct Camera {
-    sf::View view;
+#define TRAIL_SIZE 300
 
+// Model
+
+struct Position : Vector {
 };
-
-struct Position {
-    float x;
-    float y;
-
+struct Velocity : Vector {
 };
-
-struct Velocity {
-    float x;
-    float y;
-};
-
-struct Acceleration {
-    float x;
-    float y;
-
+struct Acceleration : Vector {
 };
 
 struct Attitude {
@@ -47,9 +37,18 @@ struct Mass {
 };
 
 struct Fins {
-    float offset;
     float position;
     float velocity;
+    float offset;
+};
+
+
+// Rendering
+
+struct Camera {
+    sf::View view;
+    bool slaved; // is this looking at an entity?
+
 };
 
 struct Transform { // Meant for sprite position, seperate to the model
@@ -61,18 +60,32 @@ struct Transform { // Meant for sprite position, seperate to the model
 
 struct SpriteComponent {
     TextureID texture;
+    sf::Vector2f offset = {0.f, 0.f};
     // sf::IntRect textureRect; // what part of the texture to use?
+
+};
+
+struct Selectable {
+    bool selected; // is this focused?
 
 };
 
 
 struct Context {
     bool paused;
+    bool step;
 
 };
 
+struct Trail {
+    float delta_reset;
 
+    float delta_current = 0;
+    int end = 0;
+    int index = 0;
+    Position data[TRAIL_SIZE] = {};
 
+};
 #endif // COMPONENTS_HPP
 
 

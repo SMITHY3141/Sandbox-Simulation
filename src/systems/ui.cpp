@@ -87,9 +87,7 @@ void draw_grid(sf::RenderWindow *window, const Bounds *bounds) {
 
 }
 
-void draw_thick(sf::Vector2i a, sf::Vector2i b, float thickness, sf::Color colour, sf::VertexArray *triangles) {
-    sf::Vector2f A = sf::Vector2f(a);
-    sf::Vector2f B = sf::Vector2f(b);
+void draw_thick(sf::Vector2f A, sf::Vector2f B, float thickness, sf::Color colour, sf::VertexArray *triangles) {
     sf::VertexArray triangle(sf::Triangles, 6);
 
     sf::Vector2f dir = A - B;
@@ -129,8 +127,8 @@ void draw_gridtext(sf::RenderWindow *window, const sf::View *view, sf::Font *fon
     float yaxis = std::clamp(0.0f, bounds->bottom, bounds->top);
 
     sf::VertexArray triangles(sf::Triangles);
-    draw_thick(window->mapCoordsToPixel({bounds->left, yaxis}, *view), window->mapCoordsToPixel({bounds->right, yaxis}, *view), 1, COLOUR_AXIS, &triangles);
-    draw_thick(window->mapCoordsToPixel({xaxis, bounds->top}, *view), window->mapCoordsToPixel({xaxis, bounds->bottom}, *view), 1, COLOUR_AXIS, &triangles);
+    draw_thick(sf::Vector2f(window->mapCoordsToPixel({bounds->left, yaxis}, *view)), sf::Vector2f(window->mapCoordsToPixel({bounds->right, yaxis}, *view)), 1, COLOUR_AXIS, &triangles);
+    draw_thick(sf::Vector2f(window->mapCoordsToPixel({xaxis, bounds->top}, *view)), sf::Vector2f(window->mapCoordsToPixel({xaxis, bounds->bottom}, *view)), 1, COLOUR_AXIS, &triangles);
     window->draw(triangles);
 
 
@@ -207,6 +205,9 @@ void render_sprites(sf::RenderWindow *window, entt::registry *registry, TextureM
 	auto view = registry->view<Transform, SpriteComponent>();
 	for (auto [entity, transform, data] : view.each()) {
         sf::Sprite sprite(textures->get(data.texture));
+        sf::Vector2u textureSize = sprite.getTexture()->getSize();
+        sprite.setOrigin(textureSize.x * data.offset.x, textureSize.y * data.offset.y);
+
         sprite.setPosition(transform.position);
         sprite.setRotation(transform.rotation);
         sprite.setScale(transform.scale);

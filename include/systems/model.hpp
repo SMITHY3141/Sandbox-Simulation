@@ -15,4 +15,6 @@ void ode_forcedspring(float *state, float time, float *result);
 
 void step_missiles(entt::registry *registry, float dt);
 
+void update_trails(entt::registry *registry, float dt);
+
 #endif // MODEL_HPP

@@ -14,6 +14,8 @@ void camera_controls(entt::registry *registry, InputState *state, double dt);
 
 bool handle_pause(entt::registry *registry, InputState *state);
 
+void slave_camera(entt::registry *registry);
+
 #endif // CORE_HPP
 
 

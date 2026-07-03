@@ -15,7 +15,7 @@
 
 
 int main(int argc, char** argv) {
-    (void)argc;
+    (void)argc; // maybe what save to use
     (void)argv; // silence warnings
     
     sf::ContextSettings settings;
@@ -41,6 +41,11 @@ int main(int argc, char** argv) {
     // TODO add procedural terrain too
 
     // TODO add a save system, it just saves all the components associated with each entity and their values
+    // TODO there should also be someway to convert a save into some code segment that could be put in the model_init()
+
+    // TODO add a trail component
+
+    // TODO add ODE viewers back, for example we may want to see how the pitch angle behaves around the current operating conditions
 
 
     // Initial simulation conditions
@@ -56,9 +61,9 @@ int main(int argc, char** argv) {
     sf::Clock clock; // runs immediately
 
     while (window.isOpen()) {
-
         // Event input handling
         process_events(&window, &inputs);
+
 
         float dt = clock.restart().asSeconds();
         // Actual simulation logic

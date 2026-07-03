@@ -27,7 +27,7 @@ void process_events(sf::RenderWindow *window, InputState *state) {
     if (!state->keys[sf::Keyboard::LShift]) {
         memset(state->mouse_click, 0, sizeof(state->mouse_click));
     }
-    memset(state->keys_click, 0, sizeof(state->keys_click));
+    memset(state->keys_click, 0, sizeof(state->keys_click)); // FIXME weird bug where this keeps switching, until I press another button in which case it stops
 
 
     while (window->pollEvent(event)) {
@@ -84,25 +84,29 @@ void view_init(entt::registry *registry, sf::RenderWindow *window, TextureManage
 
     sf::Vector2u size = window->getSize();
 	auto camera = registry->create();
-	registry->emplace<Camera>(camera,sf::View(sf::Vector2f(0.0, 0.0), sf::Vector2f(DEFAULT_SIZE, -(size.y * DEFAULT_SIZE / size.x))));
+	registry->emplace<Camera>(camera,sf::View(sf::Vector2f(0.0, 0.0), sf::Vector2f(DEFAULT_SIZE, -(size.y * DEFAULT_SIZE / size.x))), true); // will slave to selected with true
 
 }
 
 void model_init(entt::registry *registry) {
-    registry->ctx().emplace<Context>(true); // paused
+    registry->ctx().emplace<Context>(true, false); // paused true, single frame step off
 
     auto missile = registry->create();
-    registry->emplace<Position>(missile, 1.f, 0.f);
+    registry->emplace<Position>(missile,  1.f, 0.f);
     registry->emplace<Velocity>(missile, 0.f, 0.f);
     registry->emplace<Acceleration>(missile, 0.f, 0.f);
-    registry->emplace<Attitude>(missile, 0.75f, 0.f);
-    registry->emplace<RocketMotor>(missile, 500.f, true, 5.f);
-    registry->emplace<Mass>(missile, 100.f, 1.f);
-    registry->emplace<Fins>(missile, 0.f, 0.f, 0.f);
+    registry->emplace<Attitude>(missile, 0.f, 0.f);
+    registry->emplace<RocketMotor>(missile, 30000.f, true, 3.f);
+    registry->emplace<Mass>(missile, 160.f, 213.f); // assuming mass of 160kg, length of 3.6m, radius of 90mm, cylindrical shape, density of 1750 kg/m^3
+    registry->emplace<Fins>(missile, -0.15f, 0.f, -1.3f);
 
     registry->emplace<Transform>(missile, sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(0.0045f, 0.0045f));
-    registry->emplace<SpriteComponent>(missile, TextureID::Missile);
+    registry->emplace<SpriteComponent>(missile, TextureID::Missile, sf::Vector2f(0.4f, 0.5f));
+    registry->emplace<Selectable>(missile, true); // this is selected
+    registry->emplace<Trail>(missile, 0.25f); // time between each capture
 
+
+    slave_camera(registry); // initial slave since if we start paused it won't slave
 }
 
 void update(entt::registry *registry, InputState *state, double dt) {
@@ -111,6 +115,7 @@ void update(entt::registry *registry, InputState *state, double dt) {
 		sim_dt = TIME_STEP;
 
     //debug_print(dt);
+
     camera_controls(registry, state, dt);
 
     bool paused = handle_pause(registry, state);
@@ -121,14 +126,9 @@ void update(entt::registry *registry, InputState *state, double dt) {
     }
 
     step_missiles(registry, sim_dt);
+    update_trails(registry, sim_dt);
 
-
-    //spawn_particle(registry, state, ode_forcedspring);
-
-
-
-    //step_particles(registry, sim_dt);
-
+    slave_camera(registry);
 
 }
 
@@ -146,8 +146,10 @@ void render(entt::registry *registry, sf::RenderWindow *window, TextureManager *
 
     update_transforms(registry); // updates Transform (used visually), with Position and Attitude components
 
-    render_sprites(window, registry, textures, &bounds);
-    draw_particles(window, registry, &bounds);
 
+    draw_trails(window, registry, &bounds);
+    render_sprites(window, registry, textures, &bounds);
+    draw_missile_debug(window, registry, &bounds);
+    draw_particles(window, registry, &bounds);
 
 }
